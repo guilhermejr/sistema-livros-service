@@ -1,0 +1,20 @@
+services:
+  livros-service:
+    image: guilhermejr/sistema-livros-service
+    container_name: livros-service
+    restart: always
+    env_file: /home/guilhermejr/secrets/livros-service.env
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 768m
+    environment:
+      - JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=50 -XX:+ExitOnOutOfMemoryError
+    ports:
+      - "127.0.0.1:9013:9013"
+
+networks:
+  default:
+    external: true
+    name: rede
