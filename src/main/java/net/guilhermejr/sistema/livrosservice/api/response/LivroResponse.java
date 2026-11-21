@@ -21,10 +21,6 @@ public class LivroResponse {
     private Integer paginas;
     private String editora;
     private List<String> autores;
-    private String colecao;
-    private String tradutor;
-    private ItemResponse pais;
-    private ItemResponse genero;
     private ItemResponse formato;
     private String estante;
     /** Id da imagem em GET /capas/{id}; null quando o livro não tem capa. */

@@ -39,16 +39,6 @@ public class Livro extends Auditoria implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Editora editora;
 
-    private String colecao;
-
-    private String tradutor;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Pais pais;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Genero genero;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Formato formato;
 

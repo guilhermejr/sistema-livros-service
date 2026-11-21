@@ -27,15 +27,12 @@ import java.util.stream.Collectors;
 @Service
 public class LivroService {
 
-    private static final Sort POR_NOME = Sort.by("nome");
     private static final Sort POR_ID = Sort.by("id");
 
     private final LivroRepository livroRepository;
     private final AutorRepository autorRepository;
     private final EditoraRepository editoraRepository;
     private final EstanteRepository estanteRepository;
-    private final PaisRepository paisRepository;
-    private final GeneroRepository generoRepository;
     private final FormatoRepository formatoRepository;
     private final CapaRepository capaRepository;
     private final BuscadorDadosIsbn buscadorDadosIsbn;
@@ -63,8 +60,6 @@ public class LivroService {
 
         UUID usuario = usuario();
         return new OpcoesResponse(
-                itens(paisRepository.findAll(POR_NOME), Pais::getId, Pais::getNome),
-                itens(generoRepository.findAll(POR_ID), Genero::getId, Genero::getNome),
                 itens(formatoRepository.findAll(POR_ID), Formato::getId, Formato::getNome),
                 itens(autorRepository.findAllByUsuarioOrderByNomeAsc(usuario), Autor::getId, Autor::getNome),
                 itens(editoraRepository.findAllByUsuarioOrderByNomeAsc(usuario), Editora::getId, Editora::getNome),
@@ -217,13 +212,7 @@ public class LivroService {
         livro.setSubtitulo(Textos.limpar(request.getSubtitulo()));
         livro.setAnoPublicacao(request.getAnoPublicacao());
         livro.setPaginas(request.getPaginas());
-        livro.setColecao(Textos.limpar(request.getColecao()));
-        livro.setTradutor(Textos.limpar(request.getTradutor()));
 
-        livro.setPais(paisRepository.findById(request.getPaisId())
-                .orElseThrow(() -> new ExceptionNotFound("País não encontrado.")));
-        livro.setGenero(generoRepository.findById(request.getGeneroId())
-                .orElseThrow(() -> new ExceptionNotFound("Gênero não encontrado.")));
         livro.setFormato(formatoRepository.findById(request.getFormatoId())
                 .orElseThrow(() -> new ExceptionNotFound("Formato não encontrado.")));
 
@@ -272,10 +261,6 @@ public class LivroService {
                 .paginas(livro.getPaginas())
                 .editora(livro.getEditora() == null ? null : livro.getEditora().getNome())
                 .autores(livro.getAutores().stream().map(Autor::getNome).sorted(String.CASE_INSENSITIVE_ORDER).toList())
-                .colecao(livro.getColecao())
-                .tradutor(livro.getTradutor())
-                .pais(item(livro.getPais(), Pais::getId, Pais::getNome))
-                .genero(item(livro.getGenero(), Genero::getId, Genero::getNome))
                 .formato(item(livro.getFormato(), Formato::getId, Formato::getNome))
                 .estante(livro.getEstante() == null ? null : livro.getEstante().getNome())
                 .capa(capa == null ? null : capa.getId())

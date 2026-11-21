@@ -14,11 +14,11 @@ import java.util.UUID;
 public interface LivroRepository extends JpaRepository<Livro, Long> {
 
     /** Tudo o que a lista mostra vem numa consulta só. */
-    @EntityGraph(attributePaths = {"autores", "editora", "pais", "genero", "formato", "estante"})
+    @EntityGraph(attributePaths = {"autores", "editora", "formato", "estante"})
     List<Livro> findAllByUsuarioOrderByTituloAsc(UUID usuario);
 
     /** Busca por id restringindo ao dono: id de outro usuário não é encontrado. */
-    @EntityGraph(attributePaths = {"autores", "editora", "pais", "genero", "formato", "estante"})
+    @EntityGraph(attributePaths = {"autores", "editora", "formato", "estante"})
     Optional<Livro> findByIdAndUsuario(Long id, UUID usuario);
 
     List<Livro> findAllByUsuarioAndIsbnOrderByTituloAsc(UUID usuario, String isbn);

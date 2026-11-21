@@ -44,18 +44,6 @@ public class LivroRequest {
     @NotEmpty
     private List<@NotBlank @Size(max = 200) String> autores;
 
-    @Size(max = 100)
-    private String colecao;
-
-    @Size(max = 200)
-    private String tradutor;
-
-    @NotNull
-    private Long paisId;
-
-    @NotNull
-    private Long generoId;
-
     @NotNull
     private Long formatoId;
 
