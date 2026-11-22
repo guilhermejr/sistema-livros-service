@@ -96,22 +96,34 @@ public class BuscadorCapas {
     public Optional<Imagem> buscar(Consulta consulta) {
 
         boolean google = !chaveGoogle.isEmpty();
+        // A Open Library pode falhar só para uma capa (um 503 de arquivo quebrado do lado
+        // dela): a busca por título ainda tenta. Se ela também não achar, a falha volta,
+        // porque a Open Library talvez tivesse a capa.
+        BuscaIndisponivelException falhaOpenLibrary = null;
         if (isbnPesquisavel(consulta.isbn())) {
             Optional<Imagem> imagem = google ? googleBooks("isbn:" + consulta.isbn(), null, OrigemCapa.GOOGLE_BOOKS) : Optional.empty();
             if (imagem.isEmpty()) {
-                imagem = openLibrary(consulta.isbn());
+                try {
+                    imagem = openLibrary(consulta.isbn());
+                } catch (BuscaIndisponivelException e) {
+                    falhaOpenLibrary = e;
+                }
             }
             if (imagem.isPresent()) {
                 return imagem;
             }
         }
         String titulo = tituloBase(consulta.titulo());
-        if (!google || titulo == null) {
-            return Optional.empty();
+        Optional<Imagem> imagem = Optional.empty();
+        if (google && titulo != null) {
+            String autor = consulta.autor() == null ? "" : consulta.autor().split(",")[0].strip();
+            String q = "intitle:" + titulo + (autor.isEmpty() ? "" : " inauthor:" + autor);
+            imagem = googleBooks(q, consulta, OrigemCapa.GOOGLE_BOOKS_TITULO);
         }
-        String autor = consulta.autor() == null ? "" : consulta.autor().split(",")[0].strip();
-        String q = "intitle:" + titulo + (autor.isEmpty() ? "" : " inauthor:" + autor);
-        return googleBooks(q, consulta, OrigemCapa.GOOGLE_BOOKS_TITULO);
+        if (imagem.isEmpty() && falhaOpenLibrary != null) {
+            throw falhaOpenLibrary;
+        }
+        return imagem;
 
     }
 

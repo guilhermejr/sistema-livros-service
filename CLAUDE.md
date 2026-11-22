@@ -51,6 +51,7 @@ Measured on 40 real ISBNs: Google knew 1 by ISBN, Open Library 13; title search 
 - **Off in the `dev` profile** (`livros.capas.tarefa-ativa: false` in `application.yml`): the local database is a copy of the same books, and searching on both sides would spend the same key's daily quota twice. Locally a cover only comes from the "Buscar capa" button.
 - **Without the Google key it does nothing.** Searching Open Library alone would mark books as tried that the title search would find later.
 - A temporary failure (5xx, network, Google's 429 when the free 1,000/day quota runs out) throws `BuscaIndisponivelException`: the batch stops **without** marking the book and resumes next round. Only a real "not found" is recorded.
+- **A failure that never goes away doesn't block the queue.** Open Library answers 503 forever for some covers (a broken file on its side; seen for ISBN 9788533613379 in Nov 2026, which stalled the task for a day, since the queue goes by id). When Open Library fails, `buscar` still tries the title search and rethrows only if that finds nothing. When the same book fails `FALHAS_SEGUIDAS` (3) rounds in a row, the task records it as tried without a cover and moves on. Quota (429) never counts. The counter lives in memory and resets on restart.
 
 Changing the ISBN drops an automatic cover and resets `capa_buscada`; changing the title drops only a `GOOGLE_BOOKS_TITULO` one. A manual cover always stays. `V003` reset `capa_buscada` of books without a cover, so the title search reaches the ones already tried by ISBN.
 
